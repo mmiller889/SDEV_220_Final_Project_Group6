@@ -4,7 +4,7 @@ from tkinter import messagebox
 class ClothingInventory(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.config(width=1000, height=1000)
+        self.config(width=500, height=300)  # Adjusted window size for consistency
         self.title("Clothing Inventory System")
 
         # Inventory with initial quantities
@@ -15,51 +15,60 @@ class ClothingInventory(tk.Tk):
             "Long-Sleeve Tops": 400
         }
 
-        # Create a label
+        # Welcome label
         label1 = tk.Label(self, text="Welcome to Our Clothing Inventory System")
         label1.pack()
         
-        # Create a button that displays inventory
+        # Button to display inventory
         button_view_inventory = tk.Button(self, text="View Inventory", command=self.display_inventory)
         button_view_inventory.pack()
         
-        # Create a button that opens a window to update inventory
+        # Button to open update window
         button_update_inventory = tk.Button(self, text="Update Inventory", command=self.open_update_window)
         button_update_inventory.pack()
 
     def display_inventory(self):
-        # Display inventory details
+        # Display current inventory in a message box
         inventory_details = "\n".join(f"{item}: {quantity}" for item, quantity in self.inventory.items())
         messagebox.showinfo("Inventory Details", inventory_details)
 
     def open_update_window(self):
-        # Create a window to update inventory (Add, Remove, Update products)
-        update_window = tk.Toplevel()
+        # Window for updating inventory items
+        update_window = tk.Toplevel(self)
         update_window.title("Update Inventory")
+        update_window.geometry("400x200")  # Consistent window size
 
-        # Labels and entry fields to add, remove, or update products
+        # Product name input
         product_label = tk.Label(update_window, text="Product Name:")
         product_label.pack()
-        product_entry = tk.Entry(update_window)
-        product_entry.pack()
+        self.product_entry = tk.Entry(update_window)
+        self.product_entry.pack()
 
+        # Quantity input
         quantity_label = tk.Label(update_window, text="Quantity:")
         quantity_label.pack()
-        quantity_entry = tk.Entry(update_window)
-        quantity_entry.pack()
+        self.quantity_entry = tk.Entry(update_window)
+        self.quantity_entry.pack()
 
-        # Buttons to add, remove, or update products
-        add_button = tk.Button(update_window, text="Add Product", command=lambda: self.update_inventory(product_entry.get(), int(quantity_entry.get())))
+        # Button to add or update product
+        add_button = tk.Button(update_window, text="Add/Update Product", 
+                               command=self.update_inventory)
         add_button.pack()
 
-    def update_inventory(self, product, quantity):
-        # Update inventory based on user input
-        if product in self.inventory:
-            self.inventory[product] += quantity
-        else:
-            self.inventory[product] = quantity
-        messagebox.showinfo("Inventory Updated", f"{product} quantity updated to {self.inventory[product]}")
+    def update_inventory(self):
+        # Update inventory after validating input
+        product = self.product_entry.get()
+        try:
+            quantity = int(self.quantity_entry.get())
+            if quantity < 0:
+                raise ValueError("Quantity cannot be negative")
+            self.inventory[product] = self.inventory.get(product, 0) + quantity
+            messagebox.showinfo("Inventory Updated", 
+                                f"{product} quantity updated to {self.inventory[product]}")
+        except ValueError as e:
+            messagebox.showerror("Invalid Input", str(e))
 
-# Initialize the Clothing Inventory System
-root = ClothingInventory()
-root.mainloop()
+# Initialize and run the Clothing Inventory System
+if __name__ == "__main__":
+    root = ClothingInventory()
+    root.mainloop()
