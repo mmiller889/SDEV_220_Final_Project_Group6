@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from GUIpart2 import MainWindow
 
 class ClothingInventory(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -26,6 +27,10 @@ class ClothingInventory(tk.Tk):
         # Button to open update window
         button_update_inventory = tk.Button(self, text="Update Inventory", command=self.open_update_window)
         button_update_inventory.pack()
+
+        # Button to launch the ordering system
+        button_launch_ordering = tk.Button(self, text="Launch Ordering System", command=self.launch_ordering_system)
+        button_launch_ordering.pack()
 
     def display_inventory(self):
         # Display current inventory in a message box
@@ -67,6 +72,11 @@ class ClothingInventory(tk.Tk):
                                 f"{product} quantity updated to {self.inventory[product]}")
         except ValueError as e:
             messagebox.showerror("Invalid Input", str(e))
+
+    def launch_ordering_system(self):
+        # Create an instance of the MainWindow class to launch the ordering system
+        ordering_window = MainWindow()
+        ordering_window.mainloop()
 
 # Initialize and run the Clothing Inventory System
 if __name__ == "__main__":
