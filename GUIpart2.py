@@ -3,52 +3,39 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 
 class MainWindow(tk.Tk):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.config(width=500, height=300)  # Adjusted window size for consistency
-        self.title("Clothing Inventory")
+    def __init__(self, inventory):
+        super().__init__()
+        self.title("Ordering System")
+        self.geometry("600x500")
+        self.inventory = inventory
 
-        # Main label
-        label1 = tk.Label(self, text="Ordering!")
-        label1.pack()
-        
-        # Buttons for different types of orders
-        button1 = tk.Button(self, text="Start Order for In-Store Pickup", 
-                            command=lambda: self.open_secondary_window("In-Store Pickup"))
-        button1.pack()
-        
-        button2 = tk.Button(self, text="Start Order for Shipping", 
-                            command=lambda: self.open_secondary_window("Shipping"))
-        button2.pack()
+        tk.Label(self, text="Place Your Order", font=("Arial", 16)).pack(pady=10)
+        tk.Button(self, text="In-Store Pickup", command=self.in_store_pickup).pack(pady=5)
+        tk.Button(self, text="Shipping", command=self.shipping).pack(pady=5)
+        tk.Button(self, text="Exit", command=self.quit).pack(pady=5)
 
-        # Exit button
-        button3 = tk.Button(self, text="Exit", command=self.quit)
-        button3.pack()
+        self.load_and_display_image("warehousse.png", (143, 113), (10, 10))
+        self.load_and_display_image("thankyu.png", (143, 113), (450, 10))
 
-        # Load and display images
-        self.load_and_display_image("warehousse.png", 1)
-        self.load_and_display_image("thankyu.png", 2)
+    def load_and_display_image(self, image_path, size, position):
+        canvas = tk.Canvas(self, width=size[0], height=size[1])
+        canvas.place(x=position[0], y=position[1])
 
-    def load_and_display_image(self, image_path, canvas_num):
-        # Function to load and display an image in a canvas
-        canvas = tk.Canvas(self, width=143, height=113)
-        canvas.pack()
+        try:
+            image = Image.open(image_path)
+            image = image.resize(size)
+            photo_image = ImageTk.PhotoImage(image)
+            canvas.create_image(size[0] // 2, size[1] // 2, image=photo_image)
+            canvas.image = photo_image
+        except FileNotFoundError:
+            messagebox.showerror("Error", f"Image file {image_path} not found.")
 
-        image = Image.open(image_path)
-        image = image.resize((100,100))
-        photo_image = ImageTk.PhotoImage(image)
-        canvas.create_image(100, 100, image=photo_image)
-        setattr(self, f"photo_image_{canvas_num}", photo_image)  # Prevent garbage collection
+    def in_store_pickup(self):
+        messagebox.showinfo("Order", "In-Store Pickup selected. Choose items in the next window.")
 
-    def open_secondary_window(self, order_type):
-        # Create secondary window for order placement
-        newWindow = tk.Toplevel(self)
-        newWindow.title(f"Available Clothes - {order_type}")
-        newWindow.geometry("400x600")  # Consistent window size
+    def shipping(self):
+        messagebox.showinfo("Order", "Shipping selected. Choose items in the next window.")
 
-        # Code for creating order form goes here (not included for brevity)
-
-# Running the main application loop
 if __name__ == "__main__":
-    root = MainWindow()
+    root = MainWindow({})
     root.mainloop()
