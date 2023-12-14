@@ -1,14 +1,13 @@
 import tkinter as tk
-from tkinter import messagebox
-from GUIpart2 import MainWindow
+from tkinter import messagebox, simpledialog
+from OrderSystem import OrderWindow
 
 class ClothingInventory(tk.Tk):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.config(width=500, height=300)  # Adjusted window size for consistency
+    def __init__(self):
+        super().__init__()
         self.title("Clothing Inventory System")
+        self.geometry("500x400")
 
-        # Inventory with initial quantities
         self.inventory = {
             "Jeans": 1600,
             "Sweaters": 1200,
@@ -16,69 +15,35 @@ class ClothingInventory(tk.Tk):
             "Long-Sleeve Tops": 400
         }
 
-        # Welcome label
-        label1 = tk.Label(self, text="Welcome to Our Clothing Inventory System")
-        label1.pack()
-        
-        # Button to display inventory
-        button_view_inventory = tk.Button(self, text="View Inventory", command=self.display_inventory)
-        button_view_inventory.pack()
-        
-        # Button to open update window
-        button_update_inventory = tk.Button(self, text="Update Inventory", command=self.open_update_window)
-        button_update_inventory.pack()
+        tk.Label(self, text="Clothing Inventory System", font=("Arial", 16)).pack(pady=10)
 
-        # Button to launch the ordering system
-        button_launch_ordering = tk.Button(self, text="Launch Ordering System", command=self.launch_ordering_system)
-        button_launch_ordering.pack()
+        self.inventory_listbox = tk.Listbox(self)
+        self.inventory_listbox.pack(pady=10, expand=True, fill='both')
+        self.update_inventory_listbox()
 
-    def display_inventory(self):
-        # Display current inventory in a message box
-        inventory_details = "\n".join(f"{item}: {quantity}" for item, quantity in self.inventory.items())
-        messagebox.showinfo("Inventory Details", inventory_details)
+        tk.Button(self, text="Update Inventory", command=self.open_update_window).pack(pady=5)
+        tk.Button(self, text="Launch Ordering System", command=self.launch_ordering_system).pack(pady=5)
+
+    def update_inventory_listbox(self):
+        self.inventory_listbox.delete(0, tk.END)
+        for item, quantity in self.inventory.items():
+            self.inventory_listbox.insert(tk.END, f"{item}: {quantity}")
 
     def open_update_window(self):
-        # Window for updating inventory items
-        update_window = tk.Toplevel(self)
-        update_window.title("Update Inventory")
-        update_window.geometry("400x200")  # Consistent window size
-
-        # Product name input
-        product_label = tk.Label(update_window, text="Product Name:")
-        product_label.pack()
-        self.product_entry = tk.Entry(update_window)
-        self.product_entry.pack()
-
-        # Quantity input
-        quantity_label = tk.Label(update_window, text="Quantity:")
-        quantity_label.pack()
-        self.quantity_entry = tk.Entry(update_window)
-        self.quantity_entry.pack()
-
-        # Button to add or update product
-        add_button = tk.Button(update_window, text="Add/Update Product", 
-                               command=self.update_inventory)
-        add_button.pack()
-
-    def update_inventory(self):
-        # Update inventory after validating input
-        product = self.product_entry.get()
-        try:
-            quantity = int(self.quantity_entry.get())
-            if quantity < 0:
-                raise ValueError("Quantity cannot be negative")
-            self.inventory[product] = self.inventory.get(product, 0) + quantity
-            messagebox.showinfo("Inventory Updated", 
-                                f"{product} quantity updated to {self.inventory[product]}")
-        except ValueError as e:
-            messagebox.showerror("Invalid Input", str(e))
+        product = simpledialog.askstring("Update Inventory", "Enter product name:")
+        if product not in self.inventory:
+            messagebox.showerror("Error", "Product not found.")
+            return
+        quantity = simpledialog.askinteger("Update Inventory", "Enter new quantity:")
+        if quantity is None or quantity < 0:
+            messagebox.showerror("Error", "Invalid quantity.")
+            return
+        self.inventory[product] = quantity
+        self.update_inventory_listbox()
 
     def launch_ordering_system(self):
-        # Create an instance of the MainWindow class to launch the ordering system
-        ordering_window = MainWindow()
-        ordering_window.mainloop()
+        OrderWindow(self.inventory).mainloop()
 
-# Initialize and run the Clothing Inventory System
 if __name__ == "__main__":
     root = ClothingInventory()
     root.mainloop()
