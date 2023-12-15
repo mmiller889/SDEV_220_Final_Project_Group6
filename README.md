@@ -1,1 +1,1 @@
-Run GUI.py
+Run ClothingInventory.py
